@@ -2,13 +2,14 @@ import numpy as np
 from functions import *
 
 
-tot_sites = 4
-N_e_up = 2
-N_e_down = 2
+tot_sites = 8
+N_e_up = 4
+N_e_down = 4
 
 basis_set = basis_set_generator(tot_sites, N_e_up, N_e_down)
 
 print(len(basis_set))
-# print(basis_set)
-for state in basis_set:
-    print(f"{state[0]}, {state[1]}")
+# # print(basis_set)
+# for i, state in enumerate(basis_set):
+#     print(f"{i} ---- {state}")
+
