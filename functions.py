@@ -186,3 +186,7 @@ def hamiltonian_matrix_generator(basis_set, tot_sites, J_11, J_1, J_33, J_3, U):
                 hamiltonian[i, i] += U
     
     return hamiltonian
+
+
+def normalize(state):
+    return state / np.linalg.norm(state)
