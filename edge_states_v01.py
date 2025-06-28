@@ -19,21 +19,9 @@ U = 0
 start_time = process_time()
 
 
-basis_set = basis_set_generator(tot_sites, N_e_up, N_e_down)
-dim = len(basis_set)
+e_val_arr, e_vec_ps_arr = simulate_system(tot_sites, N_e_up, N_e_down, J_11, J_1, J_33, J_3, U)
+dim = len(e_val_arr)
 print(dim)
-
-
-hamiltonian = hamiltonian_matrix_generator(basis_set, tot_sites, J_11, J_1, J_33, J_3, U)
-
-
-e_val_arr, e_vec_arr_transpose = np.linalg.eigh(hamiltonian)
-e_vec_arr = e_vec_arr_transpose.transpose()
-
-
-e_vec_ps_arr = np.zeros((dim, tot_sites))
-for i, state in enumerate(e_vec_arr):
-    e_vec_ps_arr[i] = state_to_position_space(state, basis_set, tot_sites, dim)
 
 
 e_vec_ps_prob_arr = e_vec_ps_arr ** 2

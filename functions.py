@@ -5,6 +5,7 @@ from numba import jit, njit, prange
 
 
 
+# @njit
 def basis_set_generator(tot_sites, N_e_up, N_e_down):
     spin_up_basis = []
     spin_down_basis = []
@@ -32,6 +33,7 @@ def basis_set_generator(tot_sites, N_e_up, N_e_down):
 
 
 # @jit(nopython=True, parallel=True)
+# @njit
 def creation_operator(state, site):
     
     res_state = state.copy()
@@ -50,6 +52,7 @@ def creation_operator(state, site):
 
 
 # @jit(nopython=True, parallel=True)
+# @njit
 def annihilation_operator(state, site):
     
     res_state = state.copy()
@@ -68,6 +71,7 @@ def annihilation_operator(state, site):
 
 
 # @jit(nopython=True, parallel=True)
+# @njit
 def hopping_operator(state, create_site, destroy_site):
 
     if (state[create_site] == 1) and (state[destroy_site] == 0):
@@ -82,12 +86,14 @@ def hopping_operator(state, create_site, destroy_site):
 
 
 # @jit(nopython=True, parallel=True)
+# @njit
 def state_idx_mapping(basis_set):
     return {tuple(state) : i for i, state in enumerate(basis_set)}
 
 
 
 # @jit(nopython=True, parallel=True)
+# @njit
 def hamiltonian_matrix_generator(basis_set, tot_sites, J_11, J_1, J_33, J_3, U):
     dim = len(basis_set)
     hamiltonian = np.zeros((dim, dim), dtype=np.float64)
@@ -195,11 +201,13 @@ def hamiltonian_matrix_generator(basis_set, tot_sites, J_11, J_1, J_33, J_3, U):
 
 
 
+# @njit
 def normalize(state):
     return state / (np.linalg.norm(state))
 
 
 
+# @njit
 def state_to_position_space(state, basis_set, tot_sites, dim):
     pos_sp_state = np.zeros((tot_sites))
 
@@ -208,3 +216,27 @@ def state_to_position_space(state, basis_set, tot_sites, dim):
         pos_sp_state += basis_set[i][tot_sites : 2 * tot_sites] * state[i]
     
     return normalize(pos_sp_state)
+
+
+
+# @njit
+def simulate_system(tot_sites, N_e_up, N_e_down, J_11, J_1, J_33, J_3, U):
+    basis_set = basis_set_generator(tot_sites, N_e_up, N_e_down)
+    dim = len(basis_set)
+
+    hamiltonian = hamiltonian_matrix_generator(basis_set, tot_sites, J_11, J_1, J_33, J_3, U)
+
+    e_val_arr, e_vec_arr_transpose = np.linalg.eigh(hamiltonian)
+    e_vec_arr = e_vec_arr_transpose.transpose()
+
+    e_vec_ps_arr = np.zeros((dim, tot_sites))
+    for i, state in enumerate(e_vec_arr):
+        e_vec_ps_arr[i] = state_to_position_space(state, basis_set, tot_sites, dim)
+    
+    return e_val_arr, e_vec_ps_arr
+
+
+
+# def is_topological_state(state):
+#     if (e_vec_ps_prob_arr[i][0] * topo_state_factor_01 > e_vec_ps_prob_arr[i][1]) and (e_vec_ps_prob_arr[i][tot_sites - 1] * topo_state_factor_01 > e_vec_ps_prob_arr[i][tot_sites - 2]) and (e_vec_ps_prob_arr[i][0] * topo_state_factor_02 > e_vec_ps_prob_arr[i][(tot_sites // 2) - 1]) and (e_vec_ps_prob_arr[i][tot_sites - 1] * topo_state_factor_02 > e_vec_ps_prob_arr[i][tot_sites // 2]):
+#         if (e_vec_ps_prob_arr[i][2] * topo_state_factor_01 > e_vec_ps_prob_arr[i][1]) and (e_vec_ps_prob_arr[i][tot_sites - 3] * topo_state_factor_01 > e_vec_ps_prob_arr[i][tot_sites - 2]):
