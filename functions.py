@@ -4,6 +4,7 @@ from numba import jit, njit, prange
 
 
 
+
 def basis_set_generator(tot_sites, N_e_up, N_e_down):
     spin_up_basis = []
     spin_down_basis = []
@@ -29,6 +30,7 @@ def basis_set_generator(tot_sites, N_e_up, N_e_down):
     return np.array(basis)
 
 
+
 # @jit(nopython=True, parallel=True)
 def creation_operator(state, site):
     
@@ -44,6 +46,7 @@ def creation_operator(state, site):
     
     res_state[site] = 1
     return sign, res_state
+
 
 
 # @jit(nopython=True, parallel=True)
@@ -63,6 +66,7 @@ def annihilation_operator(state, site):
     return sign, res_state
 
 
+
 # @jit(nopython=True, parallel=True)
 def hopping_operator(state, create_site, destroy_site):
 
@@ -76,9 +80,11 @@ def hopping_operator(state, create_site, destroy_site):
     return (sign_create * sign_destroy), res_state
 
 
+
 # @jit(nopython=True, parallel=True)
 def state_idx_mapping(basis_set):
     return {tuple(state) : i for i, state in enumerate(basis_set)}
+
 
 
 # @jit(nopython=True, parallel=True)
@@ -188,5 +194,17 @@ def hamiltonian_matrix_generator(basis_set, tot_sites, J_11, J_1, J_33, J_3, U):
     return hamiltonian
 
 
+
 def normalize(state):
-    return state / np.linalg.norm(state)
+    return state / (np.linalg.norm(state))
+
+
+
+def state_to_position_space(state, basis_set, tot_sites, dim):
+    pos_sp_state = np.zeros((tot_sites))
+
+    for i in range(dim):
+        pos_sp_state += basis_set[i][0 : tot_sites] * state[i]
+        pos_sp_state += basis_set[i][tot_sites : 2 * tot_sites] * state[i]
+    
+    return normalize(pos_sp_state)
