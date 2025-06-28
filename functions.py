@@ -1,5 +1,7 @@
 import numpy as np
 from itertools import combinations
+from numba import jit, njit, prange
+
 
 
 def basis_set_generator(tot_sites, N_e_up, N_e_down):
@@ -27,6 +29,7 @@ def basis_set_generator(tot_sites, N_e_up, N_e_down):
     return np.array(basis)
 
 
+# @jit(nopython=True, parallel=True)
 def creation_operator(state, site):
     
     res_state = state.copy()
@@ -35,7 +38,7 @@ def creation_operator(state, site):
         return 0, None
     
     sign = 1
-    for i in range(site):
+    for i in prange(site):
         if state[i] == 1:
             sign = sign * -1
     
@@ -43,6 +46,7 @@ def creation_operator(state, site):
     return sign, res_state
 
 
+# @jit(nopython=True, parallel=True)
 def annihilation_operator(state, site):
     
     res_state = state.copy()
@@ -51,7 +55,7 @@ def annihilation_operator(state, site):
         return 0, None
     
     sign = 1
-    for i in range(site):
+    for i in prange(site):
         if state[i] == 1:
             sign = sign * -1
     
@@ -59,6 +63,7 @@ def annihilation_operator(state, site):
     return sign, res_state
 
 
+# @jit(nopython=True, parallel=True)
 def hopping_operator(state, create_site, destroy_site):
 
     if (state[create_site] == 1) and (state[destroy_site] == 0):
@@ -71,17 +76,19 @@ def hopping_operator(state, create_site, destroy_site):
     return (sign_create * sign_destroy), res_state
 
 
+# @jit(nopython=True, parallel=True)
 def state_idx_mapping(basis_set):
     return {tuple(state) : i for i, state in enumerate(basis_set)}
 
 
-def hamiltonian_matrix_generator(basis_set, tot_sites, J_11, J_1, J_33, J_3):
+# @jit(nopython=True, parallel=True)
+def hamiltonian_matrix_generator(basis_set, tot_sites, J_11, J_1, J_33, J_3, U):
     dim = len(basis_set)
     hamiltonian = np.zeros((dim, dim), dtype=np.float64)
     state_idx_dict = state_idx_mapping(basis_set)
 
     for i, state in enumerate(basis_set):
-        for j in range(tot_sites):
+        for j in prange(tot_sites):
             for k in [0, tot_sites]:
                 l = j + k
                 # print(l)
@@ -97,7 +104,7 @@ def hamiltonian_matrix_generator(basis_set, tot_sites, J_11, J_1, J_33, J_3):
                         sign, res_state = hopping_operator(state, create_site, destroy_site)
                         # print(sign, res_state)
 
-                        print(f"{state} ---- {destroy_site} ---- {create_site} ---- {sign} ---- {res_state}")
+                        # print(f"{state} ---- {destroy_site} ---- {create_site} ---- {sign} ---- {res_state}")
 
                         if sign == 0:
                             continue
@@ -118,7 +125,7 @@ def hamiltonian_matrix_generator(basis_set, tot_sites, J_11, J_1, J_33, J_3):
                         sign, res_state = hopping_operator(state, create_site, destroy_site)
                         # print(sign, res_state)
 
-                        print(f"{state} ---- {destroy_site} ---- {create_site} ---- {sign} ---- {res_state}")
+                        # print(f"{state} ---- {destroy_site} ---- {create_site} ---- {sign} ---- {res_state}")
 
                         if sign == 0:
                             continue
@@ -139,7 +146,7 @@ def hamiltonian_matrix_generator(basis_set, tot_sites, J_11, J_1, J_33, J_3):
                         sign, res_state = hopping_operator(state, create_site, destroy_site)
                         # print(sign, res_state)
 
-                        print(f"{state} ---- {destroy_site} ---- {create_site} ---- {sign} ---- {res_state}")
+                        # print(f"{state} ---- {destroy_site} ---- {create_site} ---- {sign} ---- {res_state}")
 
                         if sign == 0:
                             continue
@@ -160,7 +167,7 @@ def hamiltonian_matrix_generator(basis_set, tot_sites, J_11, J_1, J_33, J_3):
                         sign, res_state = hopping_operator(state, create_site, destroy_site)
                         # print(sign, res_state)
 
-                        print(f"{state} ---- {destroy_site} ---- {create_site} ---- {sign} ---- {res_state}")
+                        # print(f"{state} ---- {destroy_site} ---- {create_site} ---- {sign} ---- {res_state}")
 
                         if sign == 0:
                             continue
@@ -172,5 +179,10 @@ def hamiltonian_matrix_generator(basis_set, tot_sites, J_11, J_1, J_33, J_3):
                             hamiltonian[res_state_idx, i] += J_3 * sign
                         else:
                             hamiltonian[res_state_idx, i] += J_33 * sign
+    
+    for i, state in enumerate(basis_set):
+        for j in prange(tot_sites):
+            if state[j] == state[j + tot_sites] and state[j] == 1:
+                hamiltonian[i, i] += U
     
     return hamiltonian
