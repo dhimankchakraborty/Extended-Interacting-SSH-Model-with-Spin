@@ -1,4 +1,5 @@
 import numpy as np
+import scipy as sp
 from itertools import combinations
 from numba import jit, njit, prange
 
@@ -240,3 +241,34 @@ def simulate_system(tot_sites, N_e_up, N_e_down, J_11, J_1, J_33, J_3, U):
 # def is_topological_state(state):
 #     if (e_vec_ps_prob_arr[i][0] * topo_state_factor_01 > e_vec_ps_prob_arr[i][1]) and (e_vec_ps_prob_arr[i][tot_sites - 1] * topo_state_factor_01 > e_vec_ps_prob_arr[i][tot_sites - 2]) and (e_vec_ps_prob_arr[i][0] * topo_state_factor_02 > e_vec_ps_prob_arr[i][(tot_sites // 2) - 1]) and (e_vec_ps_prob_arr[i][tot_sites - 1] * topo_state_factor_02 > e_vec_ps_prob_arr[i][tot_sites // 2]):
 #         if (e_vec_ps_prob_arr[i][2] * topo_state_factor_01 > e_vec_ps_prob_arr[i][1]) and (e_vec_ps_prob_arr[i][tot_sites - 3] * topo_state_factor_01 > e_vec_ps_prob_arr[i][tot_sites - 2]):
+
+
+
+def d_x(k, J_11, J_1, J_3, J_33): # checked OK
+    return (-1 * J_11) - ((J_1 + J_33) * np.cos(k)) - (J_3 * np.cos(2 * k))
+
+
+
+def d_y(k, J_11, J_1, J_3, J_33): # checked OK
+    return (-1 * J_11) - ((J_1 - J_33) * np.sin(k)) - (J_3 * np.sin(2 * k))
+
+
+
+def delta_k_d_x(k, J_1, J_3, J_33): # checked OK
+    return ((J_1 + J_33) * np.sin(k)) + (2 * J_3 * np.sin(2 * k))
+
+
+
+def delta_k_d_y(k, J_1, J_3, J_33): # checked OK
+    return ((-1) * (J_1 - J_33) * np.cos(k)) - (2 * J_3 * np.cos(2 * k))
+
+
+
+def W_integrand(k, J_11, J_1, J_3, J_33): # checked OK
+    return (1 / (2 * np.pi)) * ((d_x(k, J_11, J_1, J_3, J_33) * delta_k_d_y(k, J_1, J_3, J_33)) - (d_y(k, J_11, J_1, J_3, J_33) * delta_k_d_x(k, J_1, J_3, J_33))) / ((d_x(k, J_11, J_1, J_3, J_33)**2) + (d_y(k, J_11, J_1, J_3, J_33)**2))
+
+
+
+def winding_no(J_11, J_1, J_3, J_33):
+    return sp.integrate.quad(lambda x: W_integrand(x, J_11, J_1, J_3, J_33), 0, (2 * np.pi - 0.1))
+

@@ -11,10 +11,12 @@ filing_factor = 1
 N_e_up = 4
 N_e_down = N_e_up
 J_11 = 0.1
-J_1 = 2
+J_1 = 1
 J_33 = 0.1
 J_3 = 1.5
 U = 0
+w_no = winding_no(J_11, J_1, J_3, J_33)
+print(w_no)
 
 start_time = process_time()
 
@@ -29,10 +31,24 @@ topo_state_ps_idx_arr = [dim // 2, (dim // 2) - 1]
 topo_state_factor_01 = 0.005
 topo_state_factor_02 = 0.1
 
+
+# for i in range(dim):
+#     if (e_vec_ps_prob_arr[i][0] * topo_state_factor_01 > e_vec_ps_prob_arr[i][1]) and (e_vec_ps_prob_arr[i][tot_sites - 1] * topo_state_factor_01 > e_vec_ps_prob_arr[i][tot_sites - 2]) and (e_vec_ps_prob_arr[i][0] * topo_state_factor_02 > e_vec_ps_prob_arr[i][(tot_sites // 2) - 1]) and (e_vec_ps_prob_arr[i][tot_sites - 1] * topo_state_factor_02 > e_vec_ps_prob_arr[i][tot_sites // 2]):
+#         if (e_vec_ps_prob_arr[i][2] * topo_state_factor_01 > e_vec_ps_prob_arr[i][1]) and (e_vec_ps_prob_arr[i][tot_sites - 3] * topo_state_factor_01 > e_vec_ps_prob_arr[i][tot_sites - 2]):
+#             topo_state_ps_idx_arr.append(i)
+
+
 for i in range(dim):
     if (e_vec_ps_prob_arr[i][0] * topo_state_factor_01 > e_vec_ps_prob_arr[i][1]) and (e_vec_ps_prob_arr[i][tot_sites - 1] * topo_state_factor_01 > e_vec_ps_prob_arr[i][tot_sites - 2]) and (e_vec_ps_prob_arr[i][0] * topo_state_factor_02 > e_vec_ps_prob_arr[i][(tot_sites // 2) - 1]) and (e_vec_ps_prob_arr[i][tot_sites - 1] * topo_state_factor_02 > e_vec_ps_prob_arr[i][tot_sites // 2]):
-        if (e_vec_ps_prob_arr[i][2] * topo_state_factor_01 > e_vec_ps_prob_arr[i][1]) and (e_vec_ps_prob_arr[i][tot_sites - 3] * topo_state_factor_01 > e_vec_ps_prob_arr[i][tot_sites - 2]):
+        if (e_vec_ps_prob_arr[i][2] * topo_state_factor_01 > e_vec_ps_prob_arr[i][1]) and (e_vec_ps_prob_arr[i][tot_sites - 3] * topo_state_factor_01 > e_vec_ps_prob_arr[i][tot_sites - 2]) and np.abs(e_val_arr[i]) < 0.00001:
             topo_state_ps_idx_arr.append(i)
+
+
+# for i in range(dim):
+#     if (e_vec_ps_prob_arr[i][0] * topo_state_factor_01 > e_vec_ps_prob_arr[i][1]) and (e_vec_ps_prob_arr[i][tot_sites - 1] * topo_state_factor_01 > e_vec_ps_prob_arr[i][tot_sites - 2]) and (e_vec_ps_prob_arr[i][0] * topo_state_factor_02 > e_vec_ps_prob_arr[i][(tot_sites // 2) - 1]) and (e_vec_ps_prob_arr[i][tot_sites - 1] * topo_state_factor_02 > e_vec_ps_prob_arr[i][tot_sites // 2]):
+#         # topo_state_ps_idx_arr.append(i)
+#         if np.abs(e_val_arr[i]) < 0.00001:
+#             topo_state_ps_idx_arr.append(i)
 
 
 print(len(topo_state_ps_idx_arr))
@@ -50,7 +66,7 @@ for i in range(len(topo_state_ps_idx_arr)):
     plt.plot(sites_pos, e_vec_ps_prob_arr[idx], label=f'{idx}, Energy: {e_val_arr[idx]}')
     # plt.ylim(0, 1)
     plt.axhline(0)
-    plt.title(f"Probability Density at Sites \n$J_{{11}}$: {J_11}, $J_1$: {J_1}, $J_3$: {J_3}, $J_{{33}}$: {J_33} & $U$: {U} \n Filing Factor: {filing_factor}")
+    plt.title(f"Probability Density at Sites \n$J_{{11}}$: {J_11}, $J_1$: {J_1}, $J_3$: {J_3}, $J_{{33}}$: {J_33} & $U$: {U} \n Filing Factor: {filing_factor}, Winding Number: {w_no[0]}")
     plt.ylabel("Probability Density for Particles at Sites($|\\psi|^2$)")
     plt.xlabel("Sites")
     plt.legend(loc="upper center")
