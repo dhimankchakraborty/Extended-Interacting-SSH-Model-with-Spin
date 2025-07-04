@@ -1,5 +1,5 @@
 import numpy as np
-from functions import *
+from archives.functions_v01 import *
 
 
 tot_sites = 8

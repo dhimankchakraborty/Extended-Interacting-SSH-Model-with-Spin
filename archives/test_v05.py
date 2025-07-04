@@ -2,7 +2,7 @@ import numpy as np
 import scipy as sp
 import matplotlib.pyplot as plt
 from time import process_time
-from functions import *
+from archives.functions_v01 import *
 
 
 
