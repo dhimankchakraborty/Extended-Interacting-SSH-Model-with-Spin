@@ -14,13 +14,14 @@ import time
 tot_sites = 12
 N_e_up = tot_sites // 2
 N_e_down = N_e_up
-J_11 = 0.1
+J_11 = 0.8
 J_1 = 0.1
 J_33 = 0.1
 J_3 = 0.1
 U = 10
 
 
+start_tot_time = time.time()
 basis_set = generator_basis_set(tot_sites, N_e_up, N_e_down)
 dim = len(basis_set)
 # print(basis_set)
@@ -38,6 +39,8 @@ ground_state = e_vec[:, 0]
 
 spin_correlation_matrix = generate_spin_correlation(ground_state, basis_set, dim, tot_sites)
 pos_sp_wf = position_space_particle_probability(ground_state, basis_set, dim, tot_sites)
+end_tot_time = time.time()
+print(end_tot_time - start_tot_time)
 # print(ground_state)
 # print(pos_sp_wf)
 # print()

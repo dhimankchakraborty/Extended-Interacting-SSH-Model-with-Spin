@@ -214,6 +214,7 @@ def generate_hamiltonian_matrix_sparse(basis_set, dim, tot_sites, U, J_1, J_11, 
 
 
 
+@njit(parallel=True)
 def position_space_particle_probability(psi, basis_set, dim, tot_sites):
     probability = np.zeros((2, tot_sites))
 
@@ -237,7 +238,7 @@ def position_space_particle_probability(psi, basis_set, dim, tot_sites):
 
 
 
-@njit
+@njit(parallel=True)
 def generate_spin_correlation(psi, basis_set, dim, tot_sites):
     C = np.zeros((tot_sites, tot_sites))
 
