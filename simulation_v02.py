@@ -14,10 +14,10 @@ import time
 tot_sites = 12
 N_e_up = tot_sites // 2
 N_e_down = N_e_up
-J_11 = 0.8
-J_1 = 0.1
-J_33 = 0.1
-J_3 = 0.1
+J_11 = 0.1
+J_1 = 1
+J_33 = 0
+J_3 = 0
 U = 10
 
 
@@ -38,7 +38,7 @@ ground_state = e_vec[:, 0]
 
 
 spin_correlation_matrix = generate_spin_correlation(ground_state, basis_set, dim, tot_sites)
-pos_sp_wf = position_space_particle_probability(ground_state, basis_set, dim, tot_sites)
+pos_sp_wf = normalize(position_space_particle_probability(ground_state, basis_set, dim, tot_sites))
 end_tot_time = time.time()
 print(end_tot_time - start_tot_time)
 # print(ground_state)
@@ -53,7 +53,7 @@ print(end_tot_time - start_tot_time)
 
 
 plt.matshow(spin_correlation_matrix)
-plt.title(f"Ground-State Spin Correlation\n$J_{{11}}$: {J_11}, $J_1$: {J_1}, $J_3$: {J_3}, $J_{{33}}$: {J_33} & $U$: {U}")
+plt.title(f"Ground-State Spin Correlation\n$J_{{11}}$: {J_11}, $J_1$: {J_1}, $J_3$: {J_3}, $J_{{33}}$: {J_33} & $U$: {U}\nNo of Electron :: Spin-up:{N_e_up}, Spin-down:{N_e_down}")
 plt.grid()
 plt.colorbar()
 plt.show()
@@ -61,9 +61,10 @@ plt.show()
 
 plt.plot(pos_sp_wf[0], label="Spin-up")
 plt.plot(pos_sp_wf[1], label="Spin-down")
-plt.title(f"Ground-State Wavefunction vs Site\n$J_{{11}}$: {J_11}, $J_1$: {J_1}, $J_3$: {J_3}, $J_{{33}}$: {J_33} & $U$: {U}")
+plt.title(f"Ground-State Wavefunction vs Site\n$J_{{11}}$: {J_11}, $J_1$: {J_1}, $J_3$: {J_3}, $J_{{33}}$: {J_33} & $U$: {U}\nNo of Electron :: Spin-up:{N_e_up}, Spin-down:{N_e_down}")
 plt.xlabel("Site")
 plt.ylabel("Wavefunction")
+plt.ylim(-1, 1)
 plt.grid()
 plt.legend(loc='upper center')
 plt.show()
@@ -74,6 +75,7 @@ plt.plot(pos_sp_wf[1]**2, label="Spin-down")
 plt.title(f"Ground-State Wavefunction vs Site\n$J_{{11}}$: {J_11}, $J_1$: {J_1}, $J_3$: {J_3}, $J_{{33}}$: {J_33} & $U$: {U}")
 plt.xlabel("Site")
 plt.ylabel("Wavefunction")
+plt.ylim(0, 1)
 plt.grid()
 plt.legend(loc='upper center')
 plt.show()
